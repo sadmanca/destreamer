@@ -71,30 +71,25 @@ export const argv: any = yargs.options({
         default: false,
         demandOption: false
     },
+    debug: {
+        alias: 'd',
+        describe: 'Set logging level to debug (only use this if you know what are doing)',
+        type: 'boolean',
+        default: false,
+        demandOption: false
+    },
+    selectQuality: {
+        alias: 'q',
+        describe: 'Select the quality with a number 1 (worst) trough 10 (best), 0 prompt the user for each video',
+        default: 10,
+        type: 'number',
+        demandOption: false
+    },
     closedCaptions: {
         alias: 'cc',
-        describe: 'Check if closed captions are available and let the user choose which one to download (will not ask if only one available).',
+        describe: 'Check if closed captions are available and let the user choose which one to download (will not ask if only one available)',
         type: 'boolean',
         default: false,
-        demandOption: false
-    },
-    noCleanup: {
-        alias: 'nc',
-        describe: 'Do not delete the downloaded video file when an FFmpeg error occurs.',
-        type: 'boolean',
-        default: false,
-        demandOption: false
-    },
-    vcodec: {
-        describe: 'Re-encode video track. Specify FFmpeg codec (e.g. libx265) or set to "none" to disable video.',
-        type: 'string',
-        default: 'copy',
-        demandOption: false
-    },
-    acodec: {
-        describe: 'Re-encode audio track. Specify FFmpeg codec (e.g. libopus) or set to "none" to disable audio.',
-        type: 'string',
-        default: 'copy',
         demandOption: false
     },
     format: {
@@ -113,17 +108,9 @@ export const argv: any = yargs.options({
 .wrap(120)
 .check(() => noArguments())
 .check((argv: any) => checkInputConflicts(argv.videoUrls, argv.inputFile))
-.check((argv: any) => {
-    if (checkOutDir(argv.outputDirectory)) {
-        return true;
-    }
-    else {
-        logger.error(CLI_ERROR.INVALID_OUTDIR);
-
-        throw new Error(' ');
-    }
-})
+.check((argv: any) => checkOutputDirectoryExistance(argv.outputDirectory))
 .check((argv: any) => isOutputTemplateValid(argv))
+.check((argv: any) => checkQualityValue(argv))
 .argv;
 
 
@@ -173,6 +160,18 @@ function checkInputConflicts(videoUrls: Array<string | number> | undefined,
 }
 
 
+function checkOutputDirectoryExistance(dir: string): boolean {
+    if (checkOutDir(dir)) {
+        return true;
+    }
+    else {
+        logger.error(CLI_ERROR.INVALID_OUTDIR, { fatal: true });
+
+        throw new Error(' ');
+    }
+}
+
+
 function isOutputTemplateValid(argv: any): boolean {
     const elementRegEx = RegExp(/{(.*?)}/g);
     let match = elementRegEx.exec(argv.outputTemplate);
@@ -197,6 +196,25 @@ function isOutputTemplateValid(argv: any): boolean {
     argv.outputTemplate = sanitize(argv.outputTemplate.trim());
 
     return true;
+}
+
+
+function checkQualityValue(argv: any): boolean {
+    if (isNaN(argv.selectQuality)) {
+        logger.error('The quality value provided was not a number, switching to default');
+        argv.selectQuality = 10;
+
+        return true;
+    }
+    else if (argv.selectQuality < 0 || argv.selectQuality > 10) {
+        logger.error('The quality value provided was outside the valid range, switching to default');
+        argv.selectQuality = 10;
+
+        return true;
+    }
+    else {
+        return true;
+    }
 }
 
 

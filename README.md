@@ -2,7 +2,9 @@
   <img src="https://github.com/snobu/destreamer/workflows/Node%20CI/badge.svg" alt="CI build status" />
 </a>
 
-**destreamer v3.0** is just around the corner. You can try out a pre-release today by cloning [this branch](https://github.com/snobu/destreamer/tree/aria2c_forRealNow).
+# destreamer v3.0 (aria2c as download manager)
+
+## This is a pre-release branch so don't expect stability, do expect speed improvements. Tons of it.
 
 ![destreamer](assets/logo.png)
 
@@ -42,6 +44,8 @@ Hopefully this doesn't break the end user agreement for Microsoft Stream. Since 
 - **npm**: usually comes with Node.js, type `npm` in your terminal to check for its presence
 - [**ffmpeg**][ffmpeg]: a recent version (year 2019 or above), in `$PATH` or in the same directory as this README file (project root).
 - [**git**][git]: one or more npm dependencies require git.
+- [**aria2**][aria2]: present in your `$PATH`, on Linux you can install via `sudo apt install aria2`.
+
 
 Destreamer takes a [honeybadger](https://www.youtube.com/watch?v=4r7wHMg5Yjg) approach towards the OS it's running on. We've successfully tested it on Windows, macOS and Linux.
 
@@ -242,6 +246,7 @@ Please open an [issue](https://github.com/snobu/destreamer/issues) and we'll loo
 [xming]: https://sourceforge.net/projects/xming/
 [node]: https://nodejs.org/en/download/
 [git]: https://git-scm.com/downloads
+[aria2]: https://aria2.github.io
 [wsl]: https://github.com/snobu/destreamer/issues/90#issuecomment-619377950
 [polimi]: https://www.polimi.it
 [unipi]: https://www.unipi.it/

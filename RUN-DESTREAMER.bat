@@ -1,0 +1,1 @@
+start cmd /k destreamer -u "sadman.hossain@mail.utoronto.ca" -f "C:\Users\MSadm\Documents\Sadman\programs\destreamer\PATH-TO-MICROSOFT-STREAM-VIDEO-LINKS\test.txt" --keepLoginCookies --noExperiments --verbose --closedCaptions --noCleanup -t "{publishDate} - {title}" --vcodec libx265 --skip

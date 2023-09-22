@@ -24,6 +24,8 @@ async function extractGuids(url: string, client: ApiClient): Promise<Array<strin
             .then((response: AxiosResponse<any> | undefined) => response?.data.metrics.videos);
         const result: Array<string> = [];
 
+        logger.error(videoNumber);
+
         // Anything above $top=100 results in 400 Bad Request
         // Use $skip to skip the first 100 and get another 100 and so on
         for (let index = 0; index <= Math.floor(videoNumber / 100); index++) {
@@ -35,7 +37,7 @@ async function extractGuids(url: string, client: ApiClient): Promise<Array<strin
                         response?.data.value.map((item: any) => item.id)
                 );
 
-            result.push(...partial);
+        result.push(...partial);
         }
 
         return result;
@@ -191,6 +193,13 @@ export function checkOutDir(directory: string): boolean {
 }
 
 
+export async function getUrlsFromPlaylist(playlistUrl: string, session: Session): Promise<Array<string>> {
+    return await ApiClient.getInstance(session).callUrl(playlistUrl, 'get', null, 'text')
+        .then(res => (res?.data as string).split(/\r?\n/)
+            .filter(line => !(line.startsWith('#') || line === '')));
+}
+
+
 export function checkRequirements(): void {
     try {
         const copyrightYearRe = new RegExp(/\d{4}-(\d{4})/);
@@ -204,6 +213,14 @@ export function checkRequirements(): void {
     }
     catch (e) {
         process.exit(ERROR_CODE.MISSING_FFMPEG);
+    }
+
+    try {
+        const aria2Ver: string = execSync('aria2c --version').toString().split('\n')[0];
+        logger.verbose(`Using ${aria2Ver}\n`);
+    }
+    catch (e) {
+        process.exit(ERROR_CODE.MISSING_ARIA2);
     }
 }
 

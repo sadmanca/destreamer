@@ -15,7 +15,7 @@ export class ApiClient {
         this.axiosInstance = axios.create({
             baseURL: session?.ApiGatewayUri,
             // timeout: 7000,
-            headers: { 'User-Agent': 'destreamer/2.0 (Hammer of Dawn)' }
+            headers: { 'User-Agent': 'destreamer/3.0 (Preview)' }
         });
 
         axiosRetry(this.axiosInstance, {
@@ -34,9 +34,10 @@ export class ApiClient {
                     return true;
                 }
                 logger.warn(`Got HTTP code ${err?.response?.status ?? undefined}. Retrying request...`);
-                logger.warn('Here is the error message: ');
-                console.dir(err.response?.data);
-                logger.warn('We called this URL: ' + err.response?.config.baseURL + err.response?.config.url);
+                logger.warn('Here is the error message: \n' +
+                    JSON.stringify(err.response?.data ?? undefined) +
+                    '\nRetrying request...');
+                logger.warn(`We called this URL: ${err.response?.config.baseURL}${err.response?.config.url}`);
 
                 const shouldRetry: boolean = retryCodes.includes(err?.response?.status ?? 0);
 
@@ -83,6 +84,13 @@ export class ApiClient {
             'Authorization': 'Bearer ' + this.session?.AccessToken
         };
 
+        logger.debug(
+            '[ApiClient.callApi]\n' +
+            'path: ' + path + '\n' +
+            'method: ' + method + '\n' +
+            'payload: ' + payload + '\n'
+        );
+
         return this.axiosInstance?.request({
             method: method,
             headers: headers,
@@ -103,6 +111,14 @@ export class ApiClient {
         const headers: object = {
             'Authorization': 'Bearer ' + this.session?.AccessToken
         };
+
+        logger.debug(
+            '[ApiClient.callUrl]\n' +
+            'url: ' + url + '\n' +
+            'method: ' + method + '\n' +
+            'payload: ' + payload + '\n' +
+            'responseType: ' + responseType + '\n'
+        );
 
         return this.axiosInstance?.request({
             method: method,
